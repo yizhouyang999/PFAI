@@ -82,11 +82,11 @@ class SearchAlgorithm:
             while not successor.empty():
                 next_node=successor.get()
                 self.search_cost=self.search_cost+1
-                if next_node.state not in [node.state for node in frontier_copy.queue]:
-                    frontier.put(next_node)
-                    frontier_copy.put(next_node)
+                # if next_node.state.state not in [node.state.state for node in frontier_copy.queue]:
+                frontier.put(next_node)
+                frontier_copy.put(next_node)
 
-    def dfs(self, verbose=False, statistics=False):
+    def dfs(self, depth_limit=None, verbose=False, statistics=False):
         start_time = time.process_time()
         frontier = []
         frontier_copy = []
@@ -112,7 +112,7 @@ class SearchAlgorithm:
             while not successor.empty():
                 next_node = successor.get()
                 self.search_cost = self.search_cost + 1
-                if next_node.state not in [node.state for node in frontier_copy]:
+                if (next_node.state.state not in [node.state.state for node in frontier_copy] and (depth_limit == None or next_node.depth <= depth_limit)):
                     frontier.append(next_node)
                     frontier_copy.append(next_node)
 
@@ -123,8 +123,8 @@ class SearchAlgorithm:
         cost_for_solution = self.goal.cost
         cpu_time_consumed = self.time_cost
         effective_branching_factor = self.goal.cost ** (1 / self.goal.depth)
-        print("depth: ", depth)
-        print("search cost: ", search_cost)
-        print("cost for solution: ", cost_for_solution)
-        print("cpu time consumed: ", cpu_time_consumed)
-        print("effective branching factor: ", effective_branching_factor)
+        print("Elapsed time (s): ", cpu_time_consumed)
+        print("Solution found at depth: ", depth)
+        print("Number of nodes explored: ", search_cost)
+        print("Cost of solution: ", cost_for_solution)
+        print("Estimated effective branching factor: ", effective_branching_factor)

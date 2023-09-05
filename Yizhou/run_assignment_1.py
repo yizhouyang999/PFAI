@@ -16,7 +16,7 @@ def main():
     print('BFS')
     # print('Start state: ')
     # mc.pretty_print()
-    goal_node = sa.bfs(verbose=True, statistics=True)
+    goal_node = sa.dfs(verbose=True, statistics=True)
     # print('goal state: ')
     # goal_node.state.pretty_print()
     # goal_node.pretty_print_solution(verbose=True)
