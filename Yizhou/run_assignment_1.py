@@ -16,10 +16,10 @@ def main():
     print('BFS')
     # print('Start state: ')
     # mc.pretty_print()
-    goal_node = sa.dfs(verbose=True, statistics=True)
+    goal_node = sa.ids(verbose=False, statistics=True)
     # print('goal state: ')
     # goal_node.state.pretty_print()
-    # goal_node.pretty_print_solution(verbose=True)
+    goal_node.pretty_print_solution(verbose=False)
     # sa.statistics()
 
 if __name__ == "__main__":

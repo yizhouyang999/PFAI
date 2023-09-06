@@ -73,7 +73,6 @@ class SearchAlgorithm:
                 end_time = time.process_time()
                 self.time_cost = end_time - start_time
                 self.search_cost = self.search_cost + 1
-                curr_node.pretty_print_solution(verbose)
                 if statistics:
                     self.statistics()
                 return curr_node
@@ -103,7 +102,6 @@ class SearchAlgorithm:
                 end_time = time.process_time()
                 self.time_cost = end_time - start_time
                 self.search_cost = self.search_cost + 1
-                curr_node.pretty_print_solution(verbose)
                 if statistics:
                     self.statistics()
                 return curr_node
@@ -115,6 +113,24 @@ class SearchAlgorithm:
                 if (next_node.state.state not in [node.state.state for node in frontier_copy] and (depth_limit == None or next_node.depth <= depth_limit)):
                     frontier.append(next_node)
                     frontier_copy.append(next_node)
+
+    """Your next assignment is to implement iterative deepening search (IDS). Do this by creating a new
+method (IDS) under the SearchAlgorithm class. As you know this algorithm is easy to construct when
+using depth limited search as one component. Add a parameter to your DFS algorithm, that if set,
+limits the algorithms depth. """
+    def ids(self, verbose=False, statistics=False):
+        start_time = time.process_time()
+        depth_limit = 0
+        while True:
+            result = self.dfs(depth_limit, verbose, False)
+
+            if result != None:
+                end_time = time.process_time()
+                self.time_cost = end_time - start_time
+                if statistics:
+                    self.statistics()
+                return result
+            depth_limit += 1
 
 
     def statistics(self):
