@@ -3,7 +3,7 @@ Define nodes of search tree and vanilla bfs search algorithm
 
 Author: Tony Lindgren
 '''
-
+from queue import PriorityQueue
 import queue
 import time
 
@@ -18,12 +18,18 @@ class Node:
         self.action = action
         self.cost = cost
         self.depth = 0
+        self.heuristic = 0
         if parent:
             self.depth = parent.depth + 1 
 
     def goal_state(self):
         return self.state.check_goal()
-    
+
+    def set_heuristic(self, heuristic=0):
+        if heuristic== 0:
+            self.heuristic=0
+        elif heuristic==1:
+            self.heuristic=1
     def successor(self):
 
         successors = queue.Queue()
@@ -35,11 +41,24 @@ class Node:
 
         return successors
 
+    def __lt__(self, other):
+        # Compare based on the h1 heuristic value
+        if self.heuristic == 0:
+            return self.state.h1() < other.state.h1()
+        elif self.heuristic == 1:
+            return self.state.h2() < other.state.h2()
+
+    def __le__(self, other):
+        # Compare based on the h1 heuristic value
+        if self.heuristic == 0:
+            return self.state.h1() <= other.state.h1()
+        elif self.heuristic == 1:
+            return self.state.h2() <= other.state.h2()
+
     def pretty_print_solution(self, verbose=False):
         if self.parent == None:
             if verbose:
                 self.state.pretty_print()
-            print("Start state")
         else:
             self.parent.pretty_print_solution(verbose)
             if verbose:
@@ -73,6 +92,7 @@ class SearchAlgorithm:
                 end_time = time.process_time()
                 self.time_cost = end_time - start_time
                 self.search_cost = self.search_cost + 1
+                curr_node.pretty_print_solution(verbose)
                 if statistics:
                     self.statistics()
                 return curr_node
@@ -81,9 +101,9 @@ class SearchAlgorithm:
             while not successor.empty():
                 next_node=successor.get()
                 self.search_cost=self.search_cost+1
-                # if next_node.state.state not in [node.state.state for node in frontier_copy.queue]:
-                frontier.put(next_node)
-                frontier_copy.put(next_node)
+                if next_node.state.state not in [node.state.state for node in frontier_copy.queue]:
+                    frontier.put(next_node)
+                    frontier_copy.put(next_node)
 
     def dfs(self, depth_limit=None, verbose=False, statistics=False):
         start_time = time.process_time()
@@ -102,8 +122,10 @@ class SearchAlgorithm:
                 end_time = time.process_time()
                 self.time_cost = end_time - start_time
                 self.search_cost = self.search_cost + 1
+                curr_node.pretty_print_solution(verbose)
                 if statistics:
                     self.statistics()
+
                 return curr_node
 
             successor = curr_node.successor()
@@ -114,10 +136,6 @@ class SearchAlgorithm:
                     frontier.append(next_node)
                     frontier_copy.append(next_node)
 
-    """Your next assignment is to implement iterative deepening search (IDS). Do this by creating a new
-method (IDS) under the SearchAlgorithm class. As you know this algorithm is easy to construct when
-using depth limited search as one component. Add a parameter to your DFS algorithm, that if set,
-limits the algorithms depth. """
     def ids(self, verbose=False, statistics=False):
         start_time = time.process_time()
         depth_limit = 0
@@ -127,11 +145,43 @@ limits the algorithms depth. """
             if result != None:
                 end_time = time.process_time()
                 self.time_cost = end_time - start_time
+                result.pretty_print_solution(verbose)
                 if statistics:
                     self.statistics()
                 return result
             depth_limit += 1
 
+    def greedy_search(self, heuristic=0, depth_limit=None, verbose=False, statistics=False):
+        start_time = time.process_time()
+        frontier = PriorityQueue()
+        frontier_copy = queue.Queue()
+        self.start.set_heuristic(heuristic)
+        frontier.put(self.start)
+        frontier_copy.put(self.start)
+        stop = False
+        while not stop:
+            if frontier.empty():
+                return None
+            curr_node = frontier.get()
+            if curr_node.goal_state():
+                self.goal = curr_node
+                stop = True
+                end_time = time.process_time()
+                self.time_cost = end_time - start_time
+                self.search_cost = self.search_cost + 1
+                curr_node.pretty_print_solution(verbose)
+                if statistics:
+                    self.statistics()
+                return curr_node
+
+            successor = curr_node.successor()
+            while not successor.empty():
+                next_node = successor.get()
+                self.search_cost = self.search_cost + 1
+                if (next_node.state.state not in [node.state.state for node in frontier_copy.queue] and (depth_limit == None or next_node.depth <= depth_limit)):
+                    next_node.set_heuristic(heuristic)
+                    frontier.put(next_node)
+                    frontier_copy.put(next_node)
 
     def statistics(self):
         depth = self.goal.depth
