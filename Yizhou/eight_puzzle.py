@@ -1,24 +1,3 @@
-"""Now it is time to look at informed search algorithms. You’ll start out with a new (harder) problem to
-tackle. This time you need to define the 8-puzzle, do this in a new file (eight_puzzle.py) and define a
-class named EightPuzzle.
-Tips for modelling this problem is to use a list of list, to denote the
-positions in the puzzle. Hence the initial state and goal state look like:
-[[7,2,4],[5,'e',6],[8,3,1]]
-respectively [['e',1,2],[3,4,5],[6,7,8]]. Where ‘e’
-denotes the empty position in the puzzle. Moves are easy to describe
-by moving the ‘e’ and swapping values in the direction of movement,
-i.e., if from initial setting we move the ‘e’ down we need to swap
-places for ‘e’ and 3. Use the m&c problem description as an
-inspiration for your problem description and also note that methods
-such as move, pretty_print and check_goal needs to be implemented.
-For informed search to work, heuristics are needed. Fortunately for the 8-puzzle there are two easy
-to implement heuristics, Number of tiles out of place (h_1) and Manhattan distance (h_2), as
-mentioned in the lecture. Use you dfs code as a basis for creating greedy search, you only need on
-new flag for the call,Greedy search, only uses the heuristic cost for prioritizing the states in the queue. Fortunately, in
-Python the class PriorityQueue from Lib/queue.py sorts entries by the lowest cost, exactly what we
-want in order to implement greedy search.
-As our node definition do not implement methods for it to be comparable, you’ll need to either
-(implement the necessary methods) or ignore this and wrap our nodes in another class,"""
 from copy import deepcopy
 class EightPuzzle:
     def __init__(self, initial_state):
