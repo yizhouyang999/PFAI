@@ -19,6 +19,7 @@ class Node:
         self.cost = cost
         self.depth = 0
         self.heuristic = 0
+        self.a_star = 0
         if parent:
             self.depth = parent.depth + 1 
 
@@ -30,6 +31,9 @@ class Node:
             self.heuristic=0
         elif heuristic==1:
             self.heuristic=1
+
+    def set_a_star(self, a_star=0):
+        self.a_star = a_star
     def successor(self):
 
         successors = queue.Queue()
@@ -43,17 +47,16 @@ class Node:
 
     def __lt__(self, other):
         # Compare based on the h1 heuristic value
-        if self.heuristic == 0:
-            return self.state.h1() < other.state.h1()
-        elif self.heuristic == 1:
-            return self.state.h2() < other.state.h2()
-
-    def __le__(self, other):
-        # Compare based on the h1 heuristic value
-        if self.heuristic == 0:
-            return self.state.h1() <= other.state.h1()
-        elif self.heuristic == 1:
-            return self.state.h2() <= other.state.h2()
+        if self.a_star == 0:
+            if self.heuristic == 0:
+                return self.state.h1() < other.state.h1()
+            elif self.heuristic == 1:
+                return self.state.h2() < other.state.h2()
+        elif self.a_star == 1:
+            if self.heuristic == 0:
+                return self.state.h1() + self.cost < other.state.h1() + other.cost
+            elif self.heuristic == 1:
+                return self.state.h2() + self.cost < other.state.h2() + other.cost
 
     def pretty_print_solution(self, verbose=False):
         if self.parent == None:
@@ -180,6 +183,40 @@ class SearchAlgorithm:
                 self.search_cost = self.search_cost + 1
                 if (next_node.state.state not in [node.state.state for node in frontier_copy.queue] and (depth_limit == None or next_node.depth <= depth_limit)):
                     next_node.set_heuristic(heuristic)
+                    frontier.put(next_node)
+                    frontier_copy.put(next_node)
+
+    def a_star(self, heuristic=0, depth_limit=39, verbose=False, statistics=False):
+        start_time = time.process_time()
+        frontier = PriorityQueue()
+        frontier_copy = queue.Queue()
+        self.start.set_heuristic(heuristic)
+        self.start.set_a_star(1)
+        frontier.put(self.start)
+        frontier_copy.put(self.start)
+        stop = False
+        while not stop:
+            if frontier.empty():
+                return None
+            curr_node = frontier.get()
+            if curr_node.goal_state():
+                self.goal = curr_node
+                stop = True
+                end_time = time.process_time()
+                self.time_cost = end_time - start_time
+                self.search_cost = self.search_cost + 1
+                curr_node.pretty_print_solution(verbose)
+                if statistics:
+                    self.statistics()
+                return curr_node
+
+            successor = curr_node.successor()
+            while not successor.empty():
+                next_node = successor.get()
+                self.search_cost = self.search_cost + 1
+                if (next_node.state.state not in [node.state.state for node in frontier_copy.queue] and (depth_limit == None or next_node.depth <= depth_limit)):
+                    next_node.set_heuristic(heuristic)
+                    next_node.set_a_star(1)
                     frontier.put(next_node)
                     frontier_copy.put(next_node)
 

@@ -24,7 +24,8 @@ def main():
     # print('goal state: ')
     # goal_node.state.pretty_print()
     # goal_node.pretty_print_solution(verbose=False)
-    # sa.statistics()
-    goal_node=ep_sa.greedy_search(heuristic=1, verbose=False, statistics=True)
+    # # sa.statistics()
+    # goal_node=ep_sa.greedy_search(heuristic=1, verbose=False, statistics=True)
+    goal_node = ep_sa.a_star(heuristic=1, verbose=False, statistics=True)
 if __name__ == "__main__":
     main()
