@@ -24,9 +24,10 @@ def main():
     goal_node = ep_sa.greedy_search(heuristic=1, verbose=False, statistics=True)
     goal_node = ep_sa.a_star(heuristic=0, verbose=False, statistics=True)
     goal_node = ep_sa.a_star(heuristic=1, verbose=False, statistics=True)
-    goal_node = ep_sa.a_star(heuristic=1, verbose=False, statistics=True)
-    goal_node = ep_sa.bfs(verbose=False, statistics=True)
-    goal_node = ep_sa.dfs(verbose=False, statistics=True)
-    goal_node = ep_sa.ids(verbose=False, statistics=True)
+
+    # Try the uninformed search
+    # goal_node = ep_sa.bfs(verbose=False, statistics=True)
+    # goal_node = ep_sa.dfs(verbose=False, statistics=True)
+    # goal_node = ep_sa.ids(verbose=False, statistics=True)
 if __name__ == "__main__":
     main()
