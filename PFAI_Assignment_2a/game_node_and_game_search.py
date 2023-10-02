@@ -34,6 +34,7 @@ class GameSearch:
         self.state = game
         self.depth = depth
         self.time_limit = time_limit
+        self.start_time= None
 
     def mcts(self):
         start_time = process_time()
@@ -87,55 +88,66 @@ class GameSearch:
             return None
         best_child = max(node.successors, key=lambda child: child.wins / child.playouts if child.playouts != 0 else 0)
         return best_child.move
-    
-    def minimax_search(self):
-        start_time = process_time()
-        end_time = start_time + self.time_limit if self.time_limit is not None else None
-        _, move = self.max_value(self.state, self.depth,-100000,100000,start_time,end_time)
+
+    def has_time_exceeded(self):
+        if self.time_limit is None:
+            return False
+        elapsed_time = process_time() - self.start_time
+        return elapsed_time > self.time_limit
+
+    def minimax_search(self, alpha_beta_pruning=False):
+        self.start_time = process_time()
+        _, move = self.max_value(self.state, self.depth, -float('inf'), float('inf'), alpha_beta_pruning)
         return move
-    
-    def max_value(self, state, depth,alpha,beta,start_time,end_time):
+
+    def max_value(self, state, depth, alpha, beta, alpha_beta_pruning):
+        if self.time_limit and self.has_time_exceeded():
+            return state.eval(), None
+
         move = None
         terminal, value = state.is_terminal()
         if terminal:
-            return state.eval(), None
-        elif (end_time is not None) :
-            if process_time() - start_time >= end_time:
+            return value, None
+        elif self.time_limit:
+            if self.has_time_exceeded():
                 return state.eval(), None
         elif depth == 0:
             return state.eval(), None
         v = -100000
         actions = state.actions()
-        for action in actions: 
+        for action in actions:
             new_state = state.result(action)
-            v2, _ = self.min_value(new_state, depth - 1,alpha,beta,start_time,end_time)
+            v2, _ = self.min_value(new_state, depth - 1, alpha, beta, alpha_beta_pruning)
             if v2 > v:
                 v = v2
                 move = action
-            if v >= beta:
+            if alpha_beta_pruning and v >= beta:
                 return v, move
             alpha = max(alpha, v)
         return v, move
-    
-    def min_value(self, state, depth,alpha,beta,start_time,end_time):
+
+    def min_value(self, state, depth, alpha, beta, alpha_beta_pruning):
+        if self.time_limit and self.has_time_exceeded():
+            return state.eval(), None
+
         move = None
         terminal, value = state.is_terminal()
         if terminal:
-            return state.eval(), None
-        elif (end_time is not None) :
-            if process_time() - start_time >= end_time:
+            return value, None
+        elif self.time_limit:
+            if self.has_time_exceeded():
                 return state.eval(), None
         elif depth == 0:
             return state.eval(), None
         v = 100000
         actions = state.actions()
-        for action in actions: 
+        for action in actions:
             new_state = state.result(action)
-            v2, _ = self.max_value(new_state, depth - 1,alpha,beta,start_time,end_time)
+            v2, _ = self.max_value(new_state, depth - 1, alpha, beta, alpha_beta_pruning)
             if v2 < v:
                 v = v2
                 move = action
-            if v <= alpha:
+            if alpha_beta_pruning and v <= alpha:
                 return v, move
             beta = min(beta, v)
         return v, move
