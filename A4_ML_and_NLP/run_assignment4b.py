@@ -7,6 +7,14 @@ Author Korbinian Randl
 from decision_tree import BinaryDecisionTree
 import metrics
 import json
+import nltk
+from nltk.tokenize import word_tokenize
+from nltk.corpus import stopwords
+
+# Ensure the necessary NLTK resources are downloaded:
+nltk.download('punkt')
+nltk.download('stopwords')
+
 
 ####################################################################################################
 # Functions:                                                                                       #
@@ -20,17 +28,15 @@ def count_tokens(tokens:list, columns:list=None) -> tuple:
 
         columns:    list of allowed feature names.
 
-    
+
     returns: a lists of tokens for each of the texts.
     '''
     if columns is None:
-        columns = []
-        for entry in tokens: columns.extend(entry)
-        columns = list(set(columns))
-        print(f"Found {len(columns):d} unique tokens.")
+        columns = list(set(token for entry in tokens for token in entry))
+        print(f"Found {len(columns)} unique tokens.")
 
-    result = {column:[0]*len(tokens) for column in columns}
-    for i,entry in enumerate(tokens):
+    result = {column: [0] * len(tokens) for column in columns}
+    for i, entry in enumerate(tokens):
         for token in entry:
             if token in result:
                 result[token][i] += 1
@@ -63,8 +69,13 @@ if __name__ == '__main__':
 
     #TODO: improve the tokenization and preprocessing of the texts
     #hint you can use functions from the nltk library
-    X_train = [text.split() for text in X_train]
-    X_test  = [text.split() for text in X_test]
+    stop_words = set(stopwords.words('english'))
+
+    X_train = [word_tokenize(text) for text in X_train]
+    X_train = [[word.lower() for word in text if word.isalpha() and word.lower() not in stop_words] for text in X_train]
+
+    X_test = [word_tokenize(text) for text in X_test]
+    X_test = [[word.lower() for word in text if word.isalpha() and word.lower() not in stop_words] for text in X_test]
 
     # create bag of words:
     X_train = count_tokens(X_train)
